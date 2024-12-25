@@ -1,13 +1,14 @@
 # 프로젝트: YOLO를 활용한 실시간 CCTV 객체 감지
 
 ## 소개
-이 프로젝트는 YOLO (You Only Look Once) 모델과 Python을 사용하여 CCTV 화면에서 실시간으로 객체(자동차, 사람 등)를 감지하고, 해당 객체에 대한 바운딩 박스를 화면에 표시합니다. 이 프로그램은 mss를 사용하여 화면을 캡처하고 OpenCV를 통해 바운딩 박스를 그립니다.
+이 프로젝트는 YOLO (You Only Look Once) 모델과 Python을 사용하여 CCTV 화면에서 실시간으로 객체(자동차, 사람 등)를 감지하고, 해당 객체에 대한 바운딩 박스를 화면에 표시합니다. 이 프로그램은 `mss`를 사용하여 화면을 캡처하고 OpenCV를 통해 바운딩 박스를 그립니다. 또한, 특정 프로그램 창만을 선택하여 그 화면을 캡처할 수 있는 기능을 추가하여, 특정 프로그램에서 객체 감지를 수행할 수 있습니다.
 
 ---
 
 ## 기능
 - YOLOv8 모델을 활용한 객체 감지
 - mss를 사용하여 실시간으로 모니터 화면 캡처
+- PyGetWindow를 사용하여 특정 프로그램 창만 캡처 가능
 - OpenCV를 이용한 객체 감지 결과 화면 출력
 - PyQt5를 사용하여 GUI 기반의 객체 감지 결과 표시 가능 (선택 사항)
 - 간단한 설정으로 다양한 모니터 환경에서 작동 가능
@@ -24,7 +25,7 @@
 
 ```bash
 pip install -U pip
-pip install opencv-python-headless ultralytics mss pyqt5
+pip install opencv-python-headless ultralytics mss pyqt5 pygetwindow pillow
 ```
 
 ### 3. YOLO 모델 다운로드
@@ -32,7 +33,7 @@ YOLOv8 모델을 다운로드하여 사용할 수 있도록 설정합니다:
 
 ```python
 from ultralytics import YOLO
-model = YOLO("yolov8n.pt")
+model = YOLO("yolo11n.pt")
 ```
 
 ### 4. 프로그램 실행
@@ -49,22 +50,30 @@ python nundongja.py
 ### 주요 라이브러리
 - **OpenCV**: 객체 감지 결과를 화면에 표시하기 위한 라이브러리
 - **mss**: 모니터 화면을 캡처하기 위한 라이브러리
+- **PyGetWindow**: 특정 프로그램 창을 선택하여 화면을 캡처하기 위한 라이브러리
+- **Pillow**: 프로그램 창 캡처를 위한 라이브러리
 - **PyQt5**: GUI를 사용하여 객체 감지 결과를 표시하기 위한 선택적 라이브러리
-- **YOLO**: YOLOv8 모델을 사용하여 객체를 감지
+- **YOLO**: YOLO11 모델을 사용하여 객체를 감지
 
 ### 코드 구조
 
 #### 1. YOLO 모델 로드
 ```python
 from ultralytics import YOLO
-model = YOLO("yolov8n.pt")
+model = YOLO("yolo11n.pt")
 ```
 
 #### 2. 화면 캡처
 ```python
-import mss
-sct = mss.mss()
-monitor = sct.monitors[1]  # 첫 번째 모니터
+import pygetwindow as gw
+from PIL import ImageGrab
+
+# 특정 프로그램 창 찾기 (예: 'Untitled - Notepad')
+window_title = "Untitled - Notepad"
+window = gw.getWindowsWithTitle(window_title)[0]
+left, top, right, bottom = window.left, window.top, window.right, window.bottom
+screen = np.array(ImageGrab.grab(bbox=(left, top, right, bottom)))
+
 ```
 
 #### 3. 객체 감지 및 바운딩 박스 그리기
@@ -100,6 +109,9 @@ cv2.imshow("YOLO Object Detection", frame)
 
 4. **무한 화면 문제**
    - PyQt5를 사용하거나 OpenCV 윈도우 창을 적절히 처리하여 해결.
+  
+5. **특정 프로그램 창 캡처**
+    -PyGetWindow와 Pillow를 사용하여 선택한 프로그램 창만 캡처할 수 있는 기능 추가.
 
 ---
 
@@ -107,6 +119,8 @@ cv2.imshow("YOLO Object Detection", frame)
 - [YOLO 공식 문서](https://docs.ultralytics.com/)
 - [OpenCV 공식 문서](https://docs.opencv.org/)
 - [PyQt5 공식 문서](https://riverbankcomputing.com/software/pyqt/intro)
+- [PyGetWindow 공식 문서](https://pygetwindow.readthedocs.io/en/latest/)
+- [Pillow 공식 문서](https://pillow.readthedocs.io/en/stable/)
 
 ---
 
