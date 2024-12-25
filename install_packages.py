@@ -1,11 +1,29 @@
 import subprocess
 import sys
 
-# 설치할 패키지 리스트
-packages = ["opencv-python", "numpy", "mss", "ultralytics"]
+def install_package(package):
+    """Install a package using pip."""
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
-for package in packages:
-    try:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-    except Exception as e:
-        print(f"Failed to install {package}: {e}")
+def main():
+    """Install all required packages."""
+    packages = [
+        "opencv-python-headless",
+        "ultralytics",
+        "mss",
+        "pygetwindow",
+        "pillow",
+        "pyqt5"
+    ]
+
+    for package in packages:
+        try:
+            print(f"Installing {package}...")
+            install_package(package)
+        except subprocess.CalledProcessError as e:
+            print(f"Error installing {package}: {e}")
+            continue
+    print("All packages installed successfully.")
+
+if __name__ == "__main__":
+    main()
