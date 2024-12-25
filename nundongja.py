@@ -7,16 +7,21 @@ from PIL import ImageGrab
 # YOLO 모델 로드
 model = YOLO("yolo11n.pt")  # YOLOv8n 모델
 
-# 부분 문자열을 사용하여 창 제목에 "eyecat"이 포함된 창 찾기
+# 감지할 클래스 목록 (주어진 태그들만 필터링)
+class_names = [
+    "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train",
+    "truck", "bird", "cat", "dog", "horse", "sheep", "cow", "elephant",
+    "bear", "zebra", "giraffe"
+]
+
+# 부분 문자열을 사용하여 창 제목에 "Notepad"가 포함된 창 찾기
 window_title_tag = "eyecat"  # 여기에 포함된 태그(부분 문자열)를 입력
+# 프로그램 창 찾기
 windows = gw.getWindowsWithTitle(window_title_tag)
 
 if not windows:
-    # "eyecat"을 찾을 수 없으면 "Chrome" 창을 찾음
     windows = gw.getWindowsWithTitle("Chrome")
-    if not windows:
-        print(f"Window with title containing '{window_title_tag}' not found, and no 'Chrome' window found.")
-        exit()  # 창을 찾지 못하면 종료
+    print(f"Window with title containing '{window_title_tag}' not found.")
 
 # 첫 번째 창을 선택 (여러 개가 있을 경우)
 window = windows[0]
@@ -40,9 +45,11 @@ while True:
         cls = result.cls[0].item()  # 클래스
         label = model.names[int(cls)]  # 클래스 이름 가져오기
 
-        # 바운딩 박스 그리기
-        cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
-        cv2.putText(frame, f"{label} {conf:.2f}", (int(x1), int(y1) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+        # 감지된 클래스가 필터링한 클래스 목록에 포함되었는지 확인
+        if label in class_names:
+            # 바운딩 박스 그리기
+            cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 1)
+            cv2.putText(frame, f"{label} {conf:.2f}", (int(x1), int(y1) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
     # 화면에 결과 표시
     cv2.imshow("YOLO Object Detection", frame)
