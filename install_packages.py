@@ -8,6 +8,7 @@ def install_package(package):
 def main():
     """Install all required packages."""
     packages = [
+        "torch",
         "opencv-python-headless",
         "ultralytics",
         "mss",
