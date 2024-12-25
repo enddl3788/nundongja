@@ -5,6 +5,10 @@
 
 ---
 
+![image](https://github.com/user-attachments/assets/12d65248-ce76-41e6-8621-4e62e2a80797)
+
+---
+
 ## 기능
 - YOLOv8 모델을 활용한 객체 감지
 - mss를 사용하여 실시간으로 모니터 화면 캡처
@@ -63,26 +67,39 @@ from ultralytics import YOLO
 model = YOLO("yolo11n.pt")
 ```
 
-#### 2. 화면 캡처
+#### 2. 특정 프로그램 창 찾기 및 화면 캡처
 ```python
 import pygetwindow as gw
 from PIL import ImageGrab
 
-# 특정 프로그램 창 찾기 (예: 'Untitled - Notepad')
-window_title = "Untitled - Notepad"
-window = gw.getWindowsWithTitle(window_title)[0]
+# 특정 프로그램 창 찾기 (예: 'eyecat'이 포함된 제목을 가진 창)
+window_title_tag = "eyecat"  # 여기에 포함된 태그(부분 문자열)를 입력
+windows = gw.getWindowsWithTitle(window_title_tag)
+
+# 프로그램 창 찾기
+if not windows:
+    windows = gw.getWindowsWithTitle("Chrome")  # 'eyecat'을 찾을 수 없으면 'Chrome' 창으로 대체
+    if not windows:
+        print(f"Window with title containing '{window_title_tag}' not found, and no 'Chrome' window found.")
+        exit()  # 창을 찾지 못하면 종료
+
+# 첫 번째 창을 선택 (여러 개가 있을 경우)
+window = windows[0]
+window.activate()  # 창을 활성화
+
+# 화면 캡처
 left, top, right, bottom = window.left, window.top, window.right, window.bottom
 screen = np.array(ImageGrab.grab(bbox=(left, top, right, bottom)))
-
+frame = cv2.cvtColor(screen, cv2.COLOR_RGB2BGR)  # 색상 변환
 ```
 
 #### 3. 객체 감지 및 바운딩 박스 그리기
 ```python
 for result in results[0].boxes:
-    x1, y1, x2, y2 = result.xyxy[0].tolist()
-    conf = result.conf[0].item()
-    cls = result.cls[0].item()
-    label = model.names[int(cls)]
+    x1, y1, x2, y2 = result.xyxy[0].tolist()  # 좌표 추출
+    conf = result.conf[0].item()  # 신뢰도
+    cls = result.cls[0].item()  # 클래스
+    label = model.names[int(cls)]  # 클래스 이름 가져오기
 
     # 바운딩 박스 그리기
     cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
