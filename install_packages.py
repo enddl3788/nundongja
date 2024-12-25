@@ -8,6 +8,9 @@ def install_package(package):
 def main():
     """Install all required packages."""
     packages = [
+        "win32api",
+        "win32gui",
+        "pywin32",
         "torch",
         "opencv-python-headless",
         "ultralytics",
