@@ -7,17 +7,19 @@ from PIL import ImageGrab
 # YOLO 모델 로드
 model = YOLO("yolo11n.pt")  # YOLOv8n 모델
 
-# 캡처할 창 선택 (예시: 'Untitled - Notepad' 창을 선택)
-window_title = "Castro Street Cam 1 Live Stream - Youtube - Chrome"  # 여기에 선택할 프로그램 창의 제목을 입력
+# 부분 문자열을 사용하여 창 제목에 "eyecat"이 포함된 창 찾기
+window_title_tag = "eyecat"  # 여기에 포함된 태그(부분 문자열)를 입력
+windows = gw.getWindowsWithTitle(window_title_tag)
 
-# 프로그램 창 찾기
-window = gw.getWindowsWithTitle(window_title)
+if not windows:
+    # "eyecat"을 찾을 수 없으면 "Chrome" 창을 찾음
+    windows = gw.getWindowsWithTitle("Chrome")
+    if not windows:
+        print(f"Window with title containing '{window_title_tag}' not found, and no 'Chrome' window found.")
+        exit()  # 창을 찾지 못하면 종료
 
-if not window:
-    print(f"Window with title '{window_title}' not found.")
-    exit()
-
-window = window[0]  # 첫 번째 창을 선택
+# 첫 번째 창을 선택 (여러 개가 있을 경우)
+window = windows[0]
 window.activate()  # 창을 활성화
 
 while True:
