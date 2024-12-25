@@ -21,6 +21,9 @@
 
 ## 설치 및 실행 방법
 
+### 0. Visual C++ Redistributable 설치
+- [Visual C++ Redistributable](https://aka.ms/vs/16/release/vc_redist.x64.exe) 를 설치합니다.
+
 ### 1. Python 설치
 - Python 3.10.0 버전을 설치합니다.
 
